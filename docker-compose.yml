@@ -1,0 +1,59 @@
+services:
+  quickbite-user:
+    image: quickbite-user-service:latest
+    ports:
+      - "8081:8081"
+    container_name: quickbite-user
+    environment:
+      - DB_URL=jdbc:postgresql://quickbite-postgres:5432/quickbite_user_db
+      - DB_USER=user_svc
+      - DB_PASSWORD=user_pass
+    restart: on-failure
+    networks:
+      - quickbite-net
+
+  quickbite-restaurant:
+    image: quickbite-restaurant-service:latest
+    ports:
+      - "8082:8082"
+    container_name: quickbite-restaurant
+    environment:
+      - DB_URL=jdbc:postgresql://quickbite-postgres:5432/quickbite_restaurant_db
+      - DB_USER=restaurant_svc
+      - DB_PASSWORD=restaurant_pass
+    restart: on-failure
+    networks:
+      - quickbite-net
+
+  quickbite-order:
+    image: quickbite-order-service:latest
+    ports:
+      - "8083:8083"
+    container_name: quickbite-order
+    environment:
+      - DB_URL=jdbc:postgresql://quickbite-postgres:5432/quickbite_order_db
+      - DB_USER=order_svc
+      - DB_PASSWORD=order_pass
+      - USER_SERVICE_URL=http://quickbite-user:8081
+      - RESTAURANT_SERVICE_URL=http://quickbite-restaurant:8082
+      - NOTIFICATION_SERVICE_URL=http://quickbite-notification:8084
+    restart: on-failure
+    networks:
+      - quickbite-net
+
+  quickbite-notification:
+    image: quickbite-notification-service:latest
+    ports:
+      - "8084:8084"
+    container_name: quickbite-notification
+    environment:
+      - DB_URL=jdbc:postgresql://quickbite-postgres:5432/quickbite_notification_db
+      - DB_USER=notification_svc
+      - DB_PASSWORD=notification_pass
+    restart: on-failure
+    networks:
+      - quickbite-net
+
+networks:
+  quickbite-net:
+    external: true
